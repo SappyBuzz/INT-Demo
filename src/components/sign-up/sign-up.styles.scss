@@ -1,0 +1,23 @@
+.sign-up{
+    display: flex;
+    flex-direction: column;
+    width: 380px;
+}
+
+.titel{
+    margin:10px 0;
+}
+
+.text-area{
+    height: 74px;
+    width: 392px;
+}
+.outer-label{
+    font-size: 16px;
+    font-weight: normal;
+    display: flex;
+    color: grey;
+}
+.Toastify__toast-body{
+    white-space: pre-line;
+}
