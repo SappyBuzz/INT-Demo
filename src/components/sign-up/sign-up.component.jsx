@@ -10,6 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import './sign-up.styles.scss';
 
+import {tostConfig} from '../../tostConfig';
+
 
 
 class SignUp extends React.Component{
@@ -56,15 +58,7 @@ class SignUp extends React.Component{
                     StorageService.setRegistrationData(formData).then(()=>{
                         console.log(`User ID: ${values.userId} Password: ${values.password}`);
                         resetForm();
-                        toast(`Registration Successful.`, {
-                            position: "top-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: false,
-                            pauseOnHover: true,
-                            draggable: false,
-                            progress: undefined,
-                            });
+                        toast(`Registration Successful.`, tostConfig);
                     })
                     
                 }else{
@@ -73,15 +67,7 @@ class SignUp extends React.Component{
                     StorageService.setRegistrationData(formData).then(()=>{
                         console.log(`User ID: ${values.userId} Password: ${values.password}`);
                         resetForm();
-                        toast(`Registration Successful.`, {
-                            position: "top-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: false,
-                            pauseOnHover: true,
-                            draggable: false,
-                            progress: undefined,
-                            });
+                        toast(`Registration Successful.`, tostConfig);
                     })
                 }
 

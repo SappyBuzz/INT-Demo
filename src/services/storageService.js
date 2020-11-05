@@ -30,6 +30,24 @@ decription(data, secret) {
   },
   clearRegistrationData() {
     return localStorage.removeItem('REGISTRATION_DATA');
+  },
+
+  setLoggedInUserToken(DATA) {
+    return new Promise((resolve, reject) => {
+       localStorage.setItem('LOGGED_IN_USER_TOKEN', this.encription(DATA, this.TEMP.PASSWORD).toString());
+       resolve();
+    });
+  },
+  getLoggedInUserToken() {
+    const DATA = localStorage.getItem('LOGGED_IN_USER_TOKEN') !== null ? localStorage.getItem('LOGGED_IN_USER_TOKEN') : undefined;
+    if (DATA && DATA !== undefined) {
+      return this.decription(DATA, this.TEMP.PASSWORD);
+    } else {
+      return undefined;
+    }
+  },
+  clearLoggedInUserToken() {
+    return localStorage.removeItem('LOGGED_IN_USER_TOKEN');
   }
 
 
