@@ -9,6 +9,11 @@ const setCurrentUser = user =>({
     payload:user
 })
 
+const seAllUsers = users =>({
+    type:userActionTypes.SET_ALL_USERS,
+    payload:users
+})
+
 export const logOutUser = () => ({type: userActionTypes.LOGOUT_USER})
 
 export const fetchUser = (userInfo) => dispatch => {
@@ -36,5 +41,31 @@ export const autoLogin = () => dispatch => {
             })
         }
     }
-
 }
+
+
+    export const updateUser = (userInfo) => dispatch => {
+        const user = apiService.updateUserProfileData(userInfo);
+        console.log(user)
+        if(user){
+            StorageService.setRegistrationData(user).then(()=>{
+                dispatch(autoLogin())
+            })
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
+
+    export const getAllUsers = () => dispatch => {
+        const user = apiService.getAllUsersData();
+        console.log(user)
+        if(user){
+                dispatch(seAllUsers(user))
+            return user;
+        }else{
+            return false;
+        }
+        
+    }

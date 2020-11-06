@@ -3,8 +3,8 @@ import React from 'react';
 import './custom-button.styles.scss';
 
 
-const CustomButton = ({children, ...otherButtonProps})=>(
-    <button className={`custom-button`} {...otherButtonProps}>{children}</button>
+const CustomButton = ({children,isSubmitting, ...otherButtonProps})=>(
+    <button className={`custom-button`} disabled={isSubmitting} {...otherButtonProps}>{children}</button>
 )
 
 export default CustomButton;

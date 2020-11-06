@@ -16,7 +16,10 @@ const Header = ({currentUser,logOutUser})=>(
                 currentUser?
                 (
                     <React.Fragment>
-                        <div className="option">{currentUser.display_name}</div>
+                        {/* <div className="option">{currentUser.display_name}</div> */}
+                        <Link className="option" to="/dashboard">
+                        {currentUser.display_name}
+                        </Link>
                         <div className="option" onClick={logOutUser}>SIGN OUT</div>
                     </React.Fragment>
                     

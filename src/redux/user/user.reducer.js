@@ -18,6 +18,11 @@ const userReducer = (state=INITIAL_STATE, action) =>{
             return{
                 currentUser:null
             }
+        case userActionTypes.SET_ALL_USERS:
+            return{
+                ...state,
+                allUsers:action.payload
+            }
         default:
             return state;
     }

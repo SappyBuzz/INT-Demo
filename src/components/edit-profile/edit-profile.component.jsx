@@ -4,32 +4,54 @@ import * as Yup from 'yup';
 import FromInput from '../form-input/form-input.component';
 import CustomButton from '../custom-button/custom-button.component';
 import StorageService from '../../services/storageService';
-
+import ApiService from '../../services/apiService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-import './sign-up.styles.scss';
-
+import {connect} from 'react-redux';
+import './edit-profile.styles.scss';
+import {withRouter} from 'react-router-dom';
 import {tostConfig} from '../../tostConfig';
 
+import {updateUser} from '../../redux/user/user.actions';
 
-
-class SignUp extends React.Component{
-
+class EditProfile extends React.Component{
     constructor(){
         super();
         this.state = {
-            registered_user:null
+            user: null
         }
     }
+
+    componentDidMount(){
+        const {match} = this.props;
+        const user_id = parseInt(match.params.userId);
+        if(user_id){
+            this.setProfileData(user_id);
+        }else if(StorageService.getLoggedInUserToken()){
+            this.setProfileData(StorageService.getLoggedInUserToken());
+        }
+    }
+
+    setProfileData(userId){
+        const userData = ApiService.getUserData(userId);
+        console.log(userData)
+            if(userData && userData.length > 0 ){
+                this.setState({
+                    user: userData[0]
+                })
+            }
+    }
+
+
     render(){
-        const {registered_user} = this.state;
+        const {user} = this.state;
+        
         return(
             <div className="sign-up">
-                <h2 className="titel">I do not have an account</h2>
-                <span>Sign up</span>
+                {
+                    (user)?
                 <Formik
-            initialValues={{first_name:"",middle_name:"",last_name:"",gender:"",address:"",country:"",mobile:""}}
+            initialValues={Object.assign({},user,{confirm_password:''})}
             validationSchema={Yup.object().shape({
                 first_name: Yup.string()
                     .required('First name is required'),
@@ -46,40 +68,32 @@ class SignUp extends React.Component{
                 .matches(new RegExp('[0-9]{10}'),'Please enter valid 10 digits mobile number')
                 .min(10, 'Please enter valid 10 digits mobile number')
                 .max(10, 'Please enter valid 10 digits mobile number'),
+                password: Yup.string().required("Password is required"),
+                confirm_password: Yup.string()
+     .oneOf([Yup.ref('password'), null], 'Passwords must match')
             })}
-            
             onSubmit={(values,{resetForm })=>{
-         
-                values.id = Date.now(); 
-                values.userId = `INT_${values.first_name}${values.last_name}`;
-                values.password = `INT_${StorageService.encription(Date.now(),'90IU!@11')}`;
+                values.id = user.id;
                 values.full_name = values.middle_name?`${values.first_name} ${values.middle_name} ${values.last_name}`: `${values.first_name} ${values.last_name}`;
                 values.display_name = `${values.first_name} ${values.last_name}`;
+                const res =  ApiService.updateUserProfileData(values);
 
-                if(StorageService.getRegistrationData()){
-                    let formData = StorageService.getRegistrationData();
-                    formData.push(values);
-                    StorageService.setRegistrationData(formData).then(()=>{
-                        console.log(`User ID: ${values.userId} Password: ${values.password}`);
-                        resetForm();
-                        toast(`Registration Successful.`, tostConfig);
-                        this.setState({
-                            registered_user:values
-                        })
-                    })
-                    
+                const {updateUser} = this.props;
+                if(StorageService.getLoggedInUserToken()){
+                    if(StorageService.getRegistrationData()){
+                        const actionResponse = updateUser(values);
+                            if(actionResponse){
+                                toast(`User Updated Successfully.`, tostConfig);
+                            }else{
+                                toast(`User Update Failed.`, tostConfig);
+                            }
+                    }else{
+                        toast(`No Registered User Found. Please Signup.`, tostConfig);
+                    }   
                 }else{
-                    let formData= [];
-                    formData.push(values);
-                    StorageService.setRegistrationData(formData).then(()=>{
-                        console.log(`User ID: ${values.userId} Password: ${values.password}`);
-                        resetForm();
-                        toast(`Registration Successful.`, tostConfig);
-                        this.setState({
-                            registered_user:values
-                        })
-                    })
+                    toast(`Please Log In.`, tostConfig);
                 }
+ 
 
     
             }}
@@ -174,11 +188,28 @@ class SignUp extends React.Component{
                     label="Mobile"
                     error={errors.mobile?errors.mobile:''}
                     />
-
+                    <FromInput 
+                    type="password"
+                    name="password"
+                    value={values.password}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                    label="Password"
+                    error={errors.password?errors.password:''}
+                    />
+                    <FromInput 
+                    type="password"
+                    name="confirm_password"
+                    value={values.confirm_password}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                    label="Confirm Password"
+                    error={errors.confirm_password?errors.confirm_password:''}
+                    />
 
 
                     <div className="buttons">
-                        <CustomButton type="submit">Sign Up</CustomButton>
+                        <CustomButton type="submit" isSubmitting={isSubmitting}>Edit</CustomButton>
 
                     </div>
                     
@@ -187,11 +218,9 @@ class SignUp extends React.Component{
  
                     
 
-                 </Formik>
+                 </Formik> : <div>Loading...</div>
+    }
                  <ToastContainer />
-                 {registered_user && 
-                 <div><p>User Id: {registered_user.userId}</p><p>Password: {registered_user.password}</p></div>
-                 }
             </div>
             
 
@@ -200,4 +229,9 @@ class SignUp extends React.Component{
 
 }
 
-export default SignUp;
+const mapDispatchToProps = dispatch =>({
+    updateUser:(userInfo)=>dispatch(updateUser(userInfo))
+});
+
+
+export default withRouter(connect(null,mapDispatchToProps)(EditProfile));
